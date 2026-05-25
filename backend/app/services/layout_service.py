@@ -58,7 +58,7 @@ class LayoutService:
         bg_color, text_color = self._sample_colors(image, x, y, w, h)
         
         # Determine element type based on styling
-        element_type = self._classify_element(text, w, h, bg_color, image)
+        element_type = self._classify_element(text, x, y, w, h, bg_color, image)
         
         return {
             "type": element_type,
@@ -75,23 +75,40 @@ class LayoutService:
             }
         }
     
-    def _classify_element(self, text: str, w: int, h: int, bg_color: str, image: Image.Image) -> str:
+    def _classify_element(self, text: str, x: int, y: int, w: int, h: int, bg_color: str, image: Image.Image) -> str:
         """Classify element type based on visual properties"""
         text_lower = text.lower().strip()
+        width, height = image.size
         
         # Common button texts
-        button_keywords = ["submit", "login", "sign", "button", "click", "go", "next", "continue", 
+        button_keywords = ["submit", "login", "sign in", "sign up", "button", "click", "go", "next", "continue", 
                           "save", "cancel", "ok", "yes", "no", "send", "search", "add", "create",
                           "get started", "learn more", "download", "install"]
         
-        if any(kw in text_lower for kw in button_keywords) and w < 300:
+        # Exclude obvious non-button text (placeholders, descriptions)
+        non_button_keywords = ["please", "enter your", "email address", "password", "username", 
+                               "type your", "input", "description", "hint", "placeholder"]
+        if any(kw in text_lower for kw in non_button_keywords):
+            return "text"
+        
+        # Better button detection: must be short and have button-like styling
+        is_short = len(text) < 25
+        has_button_keyword = any(kw in text_lower for kw in button_keywords)
+        reasonable_width = w < 400
+        
+        if has_button_keyword and is_short and reasonable_width:
             return "button"
         
-        # Check if it's a heading (short text, relatively large)
-        if len(text) < 50 and h > 25:
+        # Check if it's a heading (short text, relatively large, prominent position)
+        if len(text) < 100 and h > 28 and y < height * 0.4:
             return "heading"
         
-        # Default to text
+        # Check if it's a link (blue color or link-like text)
+        link_keywords = ["forgot", "reset", "click here", "more", "learn", "details", "help"]
+        if any(kw in text_lower for kw in link_keywords):
+            return "link"
+        
+        # Default to text/paragraph
         return "text"
     
     def _detect_buttons(self, image: Image.Image, existing_elements: List[Dict]) -> List[Dict]:
