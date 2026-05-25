@@ -22,8 +22,11 @@ export default function PreviewPage() {
   const loadResult = async () => {
     setLoading(true)
     try {
-      const htmlRes = await axios.get(`${API_BASE}/api/preview/${jobId}`, { timeout: 30000 })
-      setHtml(htmlRes.data)
+      // Use fetch for HTML to avoid axios auto-parsing issues
+      const htmlRes = await fetch(`${API_BASE}/api/preview/${jobId}`)
+      if (!htmlRes.ok) throw new Error(`Preview failed: ${htmlRes.status}`)
+      const htmlText = await htmlRes.text()
+      setHtml(htmlText)
       try {
         const layoutRes = await axios.get(`${API_BASE}/api/layout/${jobId}`, { timeout: 10000 })
         setLayout(layoutRes.data)
@@ -31,6 +34,7 @@ export default function PreviewPage() {
         console.warn('Layout fetch failed:', e)
       }
     } catch (err) {
+      console.error('Preview load error:', err)
       setError('加载结果失败，请返回重新上传')
     } finally {
       setLoading(false)
@@ -160,7 +164,8 @@ export default function PreviewPage() {
               srcDoc={html}
               className="w-full min-h-[600px] border-0 rounded-xl bg-white"
               title="HTML Preview"
-              sandbox="allow-scripts"
+              sandbox="allow-scripts allow-same-origin"
+              onLoad={() => console.log('Iframe loaded, html length:', html.length)}
             />
           </div>
         )}

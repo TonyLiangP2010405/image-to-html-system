@@ -120,30 +120,73 @@ Output the complete HTML document starting with <!DOCTYPE html>."""
         
         # Ensure it starts with doctype
         if not html.lower().startswith("<!doctype") and not html.lower().startswith("<html"):
-            html = f"<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<script src=\"https://cdn.tailwindcss.com\"></script>\n</head>\n<body class=\"bg-gray-50\">\n{html}\n</body>\n</html>"
+            html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+{html}
+</body>
+</html>"""
         
-        # Ensure Tailwind CDN is present
-        if "tailwindcss.com" not in html and "cdn.tailwindcss" not in html:
+        # Ensure Tailwind CDN is present (only if not pure inline CSS already)
+        if "tailwindcss.com" not in html and "<style>" not in html:
             html = html.replace("</head>", "\n<script src=\"https://cdn.tailwindcss.com\"></script>\n</head>")
         
         return html
     
     def _fallback_html(self, prompt: str) -> str:
-        """Generate basic fallback HTML if Ollama fails"""
-        # Extract layout info from prompt for basic HTML
+        """Generate basic fallback HTML if Ollama fails - pure inline CSS, no external deps"""
         return """<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generated UI</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 480px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+        .icon { font-size: 48px; margin-bottom: 16px; }
+        h1 { font-size: 20px; font-weight: 700; color: #1a202c; margin-bottom: 8px; }
+        p { color: #718096; font-size: 15px; line-height: 1.6; }
+        .badge {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 6px 16px;
+            background: #edf2f7;
+            color: #4a5568;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+    </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
-    <div class="container mx-auto px-4 py-8">
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <p class="text-gray-600">HTML generation service temporarily unavailable. Please try again.</p>
-        </div>
+<body>
+    <div class="card">
+        <div class="icon">🔧</div>
+        <h1>HTML Generation Service Offline</h1>
+        <p>The AI HTML generation service (Ollama + Qwen2.5-Coder) is not running. Please start Ollama and try again.</p>
+        <span class="badge">Ollama not connected</span>
     </div>
 </body>
 </html>"""
