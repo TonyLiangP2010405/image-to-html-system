@@ -63,7 +63,7 @@ class PipelineService:
             f.write(html)
         
         # Build preview URL
-        preview_url = f"/preview/{job_id}"
+        preview_url = f"/api/preview/{job_id}"
         
         logger.info(f"[{job_id}] Pipeline complete. HTML saved to {html_path}")
         

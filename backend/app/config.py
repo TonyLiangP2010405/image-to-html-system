@@ -1,6 +1,8 @@
+import os
 from pydantic_settings import BaseSettings
 from functools import lru_cache
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 class Settings(BaseSettings):
     app_name: str = "Image to HTML System"
@@ -13,9 +15,9 @@ class Settings(BaseSettings):
     # Models
     florence_model: str = "microsoft/Florence-2-base"
     
-    # Paths
-    upload_dir: str = "/app/ai/outputs"
-    models_dir: str = "/app/ai/models"
+    # Paths - use project-relative path for local dev, override via env in Docker
+    upload_dir: str = os.path.join(BASE_DIR, "ai", "outputs")
+    models_dir: str = os.path.join(BASE_DIR, "ai", "models")
     
     # API
     max_file_size: int = 10 * 1024 * 1024  # 10MB
