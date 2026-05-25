@@ -8,8 +8,8 @@ class Settings(BaseSettings):
     app_name: str = "Image to HTML System"
     debug: bool = False
     
-    # Ollama
-    ollama_host: str = "http://ollama:11434"
+    # Ollama - local dev uses localhost, Docker uses container name
+    ollama_host: str = os.getenv("OLLAMA_HOST", "http://127.0.0.1:11434")
     ollama_model: str = "qwen2.5-coder:7b"
     
     # Models
