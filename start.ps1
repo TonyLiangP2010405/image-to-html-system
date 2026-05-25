@@ -1,0 +1,12 @@
+# Quick start script
+Write-Host "Image to HTML System - Quick Start"
+Write-Host "=================================="
+Write-Host ""
+Write-Host "1. Make sure Docker and Docker Compose are installed"
+Write-Host "2. Run: docker compose up -d ollama"
+Write-Host "3. Run: docker exec -it ollama ollama pull qwen2.5-coder:7b"
+Write-Host "4. Run: docker compose up"
+Write-Host ""
+Write-Host "Then open http://localhost:3000"
+Write-Host ""
+Write-Host "For manual setup, see README.md"
