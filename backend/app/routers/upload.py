@@ -64,6 +64,7 @@ async def upload_image(file: UploadFile = File(...)):
         html=result["html"],
         layout_json=result["layout_json"],
         preview_url=result["preview_url"],
+        job_id=result["job_id"],
     )
 
 

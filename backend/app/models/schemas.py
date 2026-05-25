@@ -36,6 +36,7 @@ class UploadResponse(BaseModel):
     html: str
     layout_json: Dict[str, Any]
     preview_url: str
+    job_id: str
 
 
 class HealthResponse(BaseModel):
